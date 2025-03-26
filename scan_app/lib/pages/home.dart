@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
               FirebaseAuth.instance.signOut();
               Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const Start()));
+                  MaterialPageRoute(builder: (context) => Start(isDarkMode: false , onThemeChanged: (bool value) {  },)));
             },
           )
         ],
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          "ESP32 Test Value: $testValue",
+                          "Scan to get creative recipes",
                           style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
