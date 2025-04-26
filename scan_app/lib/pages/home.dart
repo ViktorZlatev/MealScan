@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _logout() async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
+      // ignore: use_build_context_synchronously
       context,
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => Start(

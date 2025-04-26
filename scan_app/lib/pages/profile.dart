@@ -50,6 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
       });
 
       // Show custom snackbar in the center
+      // ignore: use_build_context_synchronously
       final overlay = Overlay.of(context);
       final overlayEntry = OverlayEntry(
         builder: (context) => Positioned(
@@ -108,10 +109,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
+                      // ignore: deprecated_member_use
                       color: Colors.white.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
+                          // ignore: deprecated_member_use
                           color: Colors.green.withOpacity(0.3),
                           blurRadius: 10,
                           spreadRadius: 4,
@@ -150,10 +153,12 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 30),
             Container(
               decoration: BoxDecoration(
+                // ignore: deprecated_member_use
                 color: Colors.white.withOpacity(0.9),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
+                    // ignore: deprecated_member_use
                     color: Colors.green.withOpacity(0.2),
                     blurRadius: 8,
                     spreadRadius: 3,
