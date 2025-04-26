@@ -1,9 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:scan_app/pages/start.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:scan_app/pages/start.dart';
+import 'package:scan_app/pages/your_recipes.dart';
+import 'package:scan_app/pages/profile.dart';
+import 'package:scan_app/pages/scan.dart';
+import 'package:scan_app/pages/products.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,128 +16,82 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String username = "User";
-  String testValue = "Loading..."; 
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchUsername();
+  final List<Widget> _pages = [
+    const ScanPage(),
+    const YourRecipesPage(),
+    const ProductsPage(),
+    const ProfilePage(),
+    
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
-  void fetchUsername() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      if (userDoc.exists) {
-        setState(() {
-          username = userDoc['username'] ?? "User";
-        });
-      }
-    }
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => Start(
+          isDarkMode: false,
+          onThemeChanged: (bool value) {},
+        ),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          "Home",
-          style: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.black),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => Start(isDarkMode: false , onThemeChanged: (bool value) {  },)));
-            },
-          )
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 500),
+        child: _pages[_selectedIndex],
       ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFF5E6DA),
-                  Color(0xFFFFF7F1),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.green.shade800,
+        unselectedItemColor: Colors.grey.shade600,
+        backgroundColor: Colors.white,
+        selectedLabelStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: GoogleFonts.poppins(),
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(MdiIcons.barcodeScan),
+            label: 'Scan',
           ),
-          Center(
-            child: FadeIn(
-              duration: const Duration(seconds: 1),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      // ignore: deprecated_member_use
-                      color: Colors.white.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          // ignore: deprecated_member_use
-                          color: Colors.green.withOpacity(0.3),
-                          blurRadius: 10,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Welcome, $username",
-                          style: GoogleFonts.poppins(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        BounceInDown(
-                          child: Icon(
-                            Icons.verified_user,
-                            size: 100,
-                            color: Colors.green.shade800,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          "Scan to get creative recipes",
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book_rounded),
+            label: 'Your Recipes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.production_quantity_limits_rounded),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.logout),
+            label: 'Logout',
           ),
         ],
+        onTap: (index) {
+          if (index == 4) {
+            _logout();
+          } else {
+            _onItemTapped(index);
+          }
+        },
       ),
     );
   }

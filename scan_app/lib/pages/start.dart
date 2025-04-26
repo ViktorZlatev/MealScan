@@ -73,44 +73,132 @@ class _StartState extends State<Start> {
   void initState() {
     super.initState();
     _pages = [
-      _buildPage("🏠 Welcome!", "Start exploring the app and manage your tasks efficiently."),
+      _buildPage("🏠 Welcome!"),
       _buildAboutPage(),
       _buildSettingsPage(),
     ];
   }
 
-  static Widget _buildPage(String title, String description) {
-    return Center(
+
+ static Widget _buildPage(String title) {
+  return SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 100), // more scroll space
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FadeIn(
+          const SizedBox(height: 40),
+          FadeInDown(
             child: Text(
               title,
               style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
                 color: Color(0xFF50C878),
-                shadows: [Shadow(color: Colors.black26, blurRadius: 10)],
+                shadows: [
+                  Shadow(color: Colors.black38, blurRadius: 10, offset: Offset(2, 4))
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          //const SizedBox(height: 20),
+          
+          const SizedBox(height: 30),
+          // 👇 Crazy unique text section
+          ZoomIn(
+            child: Text(
+              "✨ Our Unique Recipe Superpowers ✨",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFB388FF), // light purple
+                shadows: [
+                  Shadow(color: Colors.black26, blurRadius: 6, offset: Offset(2, 2))
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          SlideInUp(
-            child: Text(
-              description,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.roboto(fontSize: 16, color: Colors.black87),
-            ),
-          ),
+          const SizedBox(height: 30),
+          _crazyFeatureBox("🎨 Creativity", "Discover new ways to cook based on what you already have!"),
+          _crazyFeatureBox("🔥 Originality", "Every suggestion is uniquely generated from your receipts."),
+          _crazyFeatureBox("📊 Smart Analysis", "We analyze your shopping patterns to improve suggestions."),
+          _crazyFeatureBox("💡 Simplicity", "Just snap a pic of your receipt and let the app do the magic."),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+
+static Widget _crazyFeatureBox(String title, String description) {
+  return ZoomIn(
+    child: MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onHover: (_) {}, // required for hover to work
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              // ignore: deprecated_member_use
+              Colors.greenAccent.shade100.withOpacity(0.8),
+              // ignore: deprecated_member_use
+              Colors.teal.withOpacity(0.8),
+              // ignore: deprecated_member_use
+              Colors.lightGreen.withOpacity(0.7),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              // ignore: deprecated_member_use
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: Offset(0, 6),
+            ),
+          ],
+          // ignore: deprecated_member_use
+          border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+        ),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [Shadow(color: Colors.black, blurRadius: 6)],
+              ),
+            ),
+            const SizedBox(height: 12), // consistent spacing
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 
   Widget _buildAboutPage() {
     return Center(
       child: SingleChildScrollView(
+       child: Padding( 
+        padding: const EdgeInsets.only(bottom: 100),
         child: Column(
           children: [
             ElasticIn(
@@ -137,23 +225,23 @@ class _StartState extends State<Start> {
             _buildStyledText(
               "Key Features:"
               "\n"
-              " \n ✅ Scan your supermarket receipts to generate meal ideas based on the items you bought."
+              " \n ✔️ Scan your supermarket receipts to generate meal ideas based on the items you bought."
               " \n "
-              " \n ✅ Get fresh, creative recipe suggestions every week, "
+              " \n ✔️ Get fresh, creative recipe suggestions every week, "
                         "helping you make the most of your ingredients."
               " \n "
-              " \n ✅ Save and organize your favorite recipes"
+              " \n ✔️ Save and organize your favorite recipes"
                         "in a personalized cookbook."
               " \n "
-              "\n ✅ Stay inspired with new meal ideas"
+              "\n ✔️ Stay inspired with new meal ideas"
                         " for every occasion!",
             ),
             _buildStyledText(
               "Our goal is to make cooking fun, easy, and full of surprises. Let's turn your grocery list into delicious meals, one receipt at a time! ",
             ),
-             _buildStyledText(""),
 
-          ],
+           ],
+         ),
         ),
       ),
     );
