@@ -28,6 +28,8 @@ dependencies:
   #Image Picker
   image_picker: ^1.0.7
   image_picker_for_web: ^3.0.6
+  firebase_storage: ^12.4.6
+  http: ^1.4.0
 
   # OCR
   #tesseract_ocr: ^0.4.1
