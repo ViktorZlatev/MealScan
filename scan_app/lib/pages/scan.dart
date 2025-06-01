@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -103,9 +104,19 @@ class _ScanPageState extends State<ScanPage> {
     });
 
     try {
+      final Uint8List imageBytes;
+
+      if (kIsWeb) {
+        imageBytes = _webImageBytes!;
+      } else {
+        imageBytes = await File(_image!.path).readAsBytes();
+      }
+
+      final String base64Image = base64Encode(imageBytes);
+
       final inputImage = kIsWeb
           ? InputImage.fromBytes(
-              bytes: _webImageBytes!,
+              bytes: imageBytes,
               metadata: InputImageMetadata(
                 size: Size(1000, 1000),
                 rotation: InputImageRotation.rotation0deg,
@@ -122,7 +133,6 @@ class _ScanPageState extends State<ScanPage> {
         _extractedText = recognizedText.text;
       });
 
-      // ✅ Save to Firestore
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await FirebaseFirestore.instance
@@ -131,6 +141,7 @@ class _ScanPageState extends State<ScanPage> {
             .collection('scans')
             .add({
               'text': recognizedText.text,
+              'imageBase64': base64Image,
               'timestamp': FieldValue.serverTimestamp(),
             });
 
@@ -211,7 +222,6 @@ class _ScanPageState extends State<ScanPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
                       if (_image != null)
                         Column(
                           children: [
