@@ -1,74 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductsPage extends StatelessWidget {
   const ProductsPage({super.key});
 
-  final List<Map<String, String>> products = const [
-    {"name": "Tomatoes", "desc": "Fresh and organic."},
-    {"name": "Olive Oil", "desc": "Cold-pressed extra virgin."},
-    {"name": "Garlic", "desc": "Flavor booster for every dish."},
-    {"name": "Basil", "desc": "Aromatic and fresh."},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return const Center(child: Text("Please log in to see your products."));
+    }
+
+    final productsDocRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('extractedData')
+        .doc('products');
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFF5E6DA), Color(0xFFFFF7F1)],
+          colors: [Color(0xFFE8F5E9), Color(0xFFF1F8E9)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-      child: FadeIn(
-        duration: const Duration(milliseconds: 800),
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            const SizedBox(height: 30),
-            Center(
-              child: Text(
-                "Available Products",
-                style: GoogleFonts.poppins(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.shade700,
-                ),
-              ),
-            ),
-            const SizedBox(height: 25),
-            ...products.map(
-              (item) => BounceInLeft(
-                child: Card(
-                  // ignore: deprecated_member_use
-                  color: Colors.white.withOpacity(0.9),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: productsDocRef.snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 30),
+                Center(
+                  child: Text(
+                    "Your Products",
+                    style: GoogleFonts.poppins(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700,
+                    ),
                   ),
-                  elevation: 6,
-                  margin: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                const SizedBox(height: 15),
+                const Center(
+                  child: Text(
+                    "No scanned products found yet.",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            
+            return const Center(
+              child: Text(
+                "No scanned products found yet.",
+                style: TextStyle(fontSize: 16),
+              ),
+            );
+          }
+
+          final data = snapshot.data!.data() as Map<String, dynamic>;
+          final List<dynamic> products = data['products'] ?? [];
+
+          if (products.isEmpty) {
+            return const Center(
+              child: Text("Your product list is empty."),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index].toString();
+
+              return FadeInUp(
+                delay: Duration(milliseconds: 100 * index),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  margin: const EdgeInsets.symmetric(vertical: 8),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
+                    leading: const Icon(Icons.shopping_basket_rounded),
                     title: Text(
-                      item['name']!,
+                      product,
                       style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.green.shade800,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    subtitle: Text(
-                      item['desc']!,
-                      style: GoogleFonts.poppins(fontSize: 14),
-                    ),
                   ),
                 ),
-              ),
-            )
-          ],
-        ),
+              );
+            },
+          );
+        },
       ),
     );
   }

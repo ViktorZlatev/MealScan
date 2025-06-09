@@ -15,35 +15,31 @@ dependencies:
   google_mlkit_text_recognition: ^0.15.0
 
   # UI & Fonts
-  cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   animate_do: ^4.2.0
-  material_design_icons_flutter: ^7.0.7296
 
   # Firebase
   firebase_core: ^3.12.1
   firebase_auth: ^5.5.3
   cloud_firestore: ^5.6.7
 
-  #Image Picker
+  # Image Picker
   image_picker: ^1.0.7
   image_picker_for_web: ^3.0.6
   firebase_storage: ^12.4.6
   http: ^1.4.0
+  flutter_dotenv: ^5.2.1
 
-  # OCR
-  #tesseract_ocr: ^0.4.1
-  #path_provider: ^2.1.2
-
-  # Path Handling
-  #path_provider: ^2.1.1
-  #path: ^1.9.0
+  # Icons
+  material_design_icons_flutter: ^7.0.7296
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
 
-#flutter:
- # assets:
-  #  - assets/tessdata/bul.traineddata
+flutter:
+  uses-material-design: true
+#  assets:
+#    - assets/tessdata/bul.traineddata

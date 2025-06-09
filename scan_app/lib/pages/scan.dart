@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'extracted_products.dart'; // ✅ OpenAI product extractor
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -104,21 +105,14 @@ class _ScanPageState extends State<ScanPage> {
     });
 
     try {
-      final Uint8List imageBytes;
-
-      if (kIsWeb) {
-        imageBytes = _webImageBytes!;
-      } else {
-        imageBytes = await File(_image!.path).readAsBytes();
-      }
-
-      final String base64Image = base64Encode(imageBytes);
+      final Uint8List imageBytes =
+          kIsWeb ? _webImageBytes! : await File(_image!.path).readAsBytes();
 
       final inputImage = kIsWeb
           ? InputImage.fromBytes(
               bytes: imageBytes,
               metadata: InputImageMetadata(
-                size: Size(1000, 1000),
+                size: const Size(1000, 1000),
                 rotation: InputImageRotation.rotation0deg,
                 format: InputImageFormat.bgra8888,
                 bytesPerRow: 1000 * 4,
@@ -128,32 +122,77 @@ class _ScanPageState extends State<ScanPage> {
 
       final textRecognizer = TextRecognizer();
       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      final String extracted = recognizedText.text;
 
       setState(() {
-        _extractedText = recognizedText.text;
+        _extractedText = extracted;
       });
 
       final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('scans')
-            .add({
-              'text': recognizedText.text,
-              'imageBase64': base64Image,
-              'timestamp': FieldValue.serverTimestamp(),
-            });
+      if (user == null) throw Exception("User not logged in");
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Scan saved to your account.')),
-        );
-      }
+      final base64Image = base64Encode(imageBytes);
+
+      // Save scan data (raw OCR)
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('scans')
+          .add({
+        'text': extracted,
+        'imageBase64': base64Image,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // ✅ Use OpenAI to extract clean food products
+      final cleanProductsString = await OpenAIService.generateMealIdeas(extracted);
+      final cleanProductsList = cleanProductsString
+          .split('\n')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      // Save cleaned product list
+      final productsDocRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('extractedData')
+          .doc('products');
+      await productsDocRef.set({
+        'products': cleanProductsList,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // ✅ Generate recipe ideas (based on full text)
+      final recipesText = await OpenAIService.generateMealIdeas(extracted);
+      final recipesDocRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('extractedData')
+          .doc('recipes');
+      await recipesDocRef.set({
+        'recipesText': recipesText,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
       textRecognizer.close();
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Рецептите са запазени!'),
+          content: const Text('Можете да ги видите в раздела с рецепти.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Добре'),
+            ),
+          ],
+        ),
+      );
     } catch (e) {
       setState(() {
-        _extractedText = "Error during scan: ${e.toString()}";
+        _extractedText = "Грешка при сканиране: ${e.toString()}";
       });
     } finally {
       setState(() {
@@ -174,8 +213,7 @@ class _ScanPageState extends State<ScanPage> {
         ),
       ),
       child: Center(
-        child: FadeIn(
-          duration: const Duration(seconds: 1),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
