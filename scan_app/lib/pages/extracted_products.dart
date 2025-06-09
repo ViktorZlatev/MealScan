@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class OpenAIService {
-  static const _apiKey = ''; 
+  //static const _apiKey = ''; 
   static const _endpoint = 'https://api.openai.com/v1/chat/completions';
 
   static Future<String> generateMealIdeas(String inputText) async {
