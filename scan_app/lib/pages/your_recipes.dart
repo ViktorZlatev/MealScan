@@ -20,6 +20,7 @@ class YourRecipesPage extends StatelessWidget {
         .get();
 
     if (!productsSnapshot.exists || productsSnapshot.data() == null) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Няма намерени продукти.")),
       );
@@ -30,6 +31,7 @@ class YourRecipesPage extends StatelessWidget {
     final List<dynamic> productsList = data['products'] ?? [];
 
     if (productsList.isEmpty) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Няма налични продукти за генериране на рецепти.")),
       );
@@ -39,6 +41,7 @@ class YourRecipesPage extends StatelessWidget {
     final formattedProducts = productsList.join(', ');
 
     try {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Генериране на рецепти...")),
       );
@@ -52,10 +55,12 @@ class YourRecipesPage extends StatelessWidget {
           .doc('recipes')
           .set({'recipesText': recipesText});
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Рецептите са генерирани успешно!")),
       );
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Грешка при генериране: $e")),
       );
@@ -159,6 +164,7 @@ class YourRecipesPage extends StatelessWidget {
                   ...recipesList.map(
                     (recipe) => BounceInUp(
                       child: Card(
+                        // ignore: deprecated_member_use
                         color: Colors.white.withOpacity(0.9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),

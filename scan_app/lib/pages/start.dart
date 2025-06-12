@@ -83,7 +83,7 @@ class _StartState extends State<Start> {
  static Widget _buildPage(String title) {
   return SingleChildScrollView(
     child: Padding(
-      padding: const EdgeInsets.only(bottom: 100), // more scroll space
+      padding: const EdgeInsets.only(bottom: 100), 
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -102,10 +102,10 @@ class _StartState extends State<Start> {
               textAlign: TextAlign.center,
             ),
           ),
-          //const SizedBox(height: 20),
+          
           
           const SizedBox(height: 30),
-          // 👇 Crazy unique text section
+         
           ZoomIn(
             child: Text(
               "✨ Our Unique Recipe Superpowers ✨",
@@ -113,7 +113,7 @@ class _StartState extends State<Start> {
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFFB388FF), // light purple
+                color: Color(0xFFB388FF), 
                 shadows: [
                   Shadow(color: Colors.black26, blurRadius: 6, offset: Offset(2, 2))
                 ],
@@ -136,7 +136,7 @@ static Widget _crazyFeatureBox(String title, String description) {
   return ZoomIn(
     child: MouseRegion(
       cursor: SystemMouseCursors.click,
-      onHover: (_) {}, // required for hover to work
+      onHover: (_) {}, 
       child: AnimatedContainer(
         duration: Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -177,7 +177,7 @@ static Widget _crazyFeatureBox(String title, String description) {
                 shadows: [Shadow(color: Colors.black, blurRadius: 6)],
               ),
             ),
-            const SizedBox(height: 12), // consistent spacing
+            const SizedBox(height: 12), 
             Text(
               description,
               textAlign: TextAlign.center,
@@ -203,7 +203,7 @@ static Widget _crazyFeatureBox(String title, String description) {
           children: [
             ElasticIn(
               child: Container(
-                  margin: const EdgeInsets.only(top: 45 , bottom: 20), // Add margin top here
+                  margin: const EdgeInsets.only(top: 45 , bottom: 20), 
                   child: Text(
                     "ℹ️ About",
                     style: GoogleFonts.poppins(

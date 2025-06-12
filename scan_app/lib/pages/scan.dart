@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'extracted_products.dart'; // ✅ OpenAI product extractor
+import 'extracted_products.dart'; 
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -71,6 +71,7 @@ class _ScanPageState extends State<ScanPage> {
                     });
                   }
                 }
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
             ),
@@ -87,6 +88,7 @@ class _ScanPageState extends State<ScanPage> {
                     });
                   }
                 }
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
             ),
@@ -133,7 +135,7 @@ class _ScanPageState extends State<ScanPage> {
 
       final base64Image = base64Encode(imageBytes);
 
-      // Save scan data (raw OCR)
+      
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -144,7 +146,7 @@ class _ScanPageState extends State<ScanPage> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // ✅ Use OpenAI to extract clean food products
+      
       final cleanProductsString = await OpenAIService.generateMealIdeas(extracted);
       final cleanProductsList = cleanProductsString
           .split('\n')
@@ -152,7 +154,7 @@ class _ScanPageState extends State<ScanPage> {
           .where((e) => e.isNotEmpty)
           .toList();
 
-      // Save cleaned product list
+      
       final productsDocRef = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -163,7 +165,7 @@ class _ScanPageState extends State<ScanPage> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // ✅ Generate recipe ideas (based on full text)
+      
       final recipesText = await OpenAIService.generateMealIdeas(extracted);
       final recipesDocRef = FirebaseFirestore.instance
           .collection('users')
@@ -178,10 +180,11 @@ class _ScanPageState extends State<ScanPage> {
       textRecognizer.close();
 
       showDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Рецептите са запазени!'),
-          content: const Text('Можете да ги видите в раздела с рецепти.'),
+          title: const Text('Продуктите са запазени!'),
+          content: const Text('Можете да ги видите в раздела с продукти.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -222,10 +225,12 @@ class _ScanPageState extends State<ScanPage> {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
+                    // ignore: deprecated_member_use
                     color: Colors.white.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
+                        // ignore: deprecated_member_use
                         color: Colors.green.withOpacity(0.3),
                         blurRadius: 10,
                         spreadRadius: 5,
