@@ -5,7 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductsPage extends StatefulWidget {
-  const ProductsPage({super.key});
+  final FirebaseFirestore firestore;
+  final FirebaseAuth auth;
+
+  const ProductsPage({
+    super.key,
+    required this.firestore,
+    required this.auth,
+  });
 
   @override
   State<ProductsPage> createState() => _ProductsPageState();
@@ -15,10 +22,10 @@ class _ProductsPageState extends State<ProductsPage> {
   final TextEditingController _productController = TextEditingController();
 
   Future<void> _addProduct(String newProduct) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = widget.auth.currentUser;
     if (user == null || newProduct.trim().isEmpty) return;
 
-    final docRef = FirebaseFirestore.instance
+    final docRef = widget.firestore
         .collection('users')
         .doc(user.uid)
         .collection('extractedData')
@@ -38,10 +45,10 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   Future<void> _deleteProduct(String productToRemove) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = widget.auth.currentUser;
     if (user == null) return;
 
-    final docRef = FirebaseFirestore.instance
+    final docRef = widget.firestore
         .collection('users')
         .doc(user.uid)
         .collection('extractedData')
@@ -58,12 +65,12 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = widget.auth.currentUser;
     if (user == null) {
       return const Center(child: Text("Please log in to see your products."));
     }
 
-    final productsDocRef = FirebaseFirestore.instance
+    final productsDocRef = widget.firestore
         .collection('users')
         .doc(user.uid)
         .collection('extractedData')
@@ -92,7 +99,7 @@ class _ProductsPageState extends State<ProductsPage> {
                     fontWeight: FontWeight.bold,
                     color: Colors.green.shade700,
                   ),
-                   textAlign: TextAlign.center,
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),

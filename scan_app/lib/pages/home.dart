@@ -7,6 +7,7 @@ import 'package:scan_app/pages/your_recipes.dart';
 import 'package:scan_app/pages/profile.dart';
 import 'package:scan_app/pages/scan.dart';
 import 'package:scan_app/pages/products.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,13 +19,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const ScanPage(),
-    const YourRecipesPage(),
-    const ProductsPage(),
-    const ProfilePage(),
-    
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      const ScanPage(),
+      const YourRecipesPage(),
+      ProductsPage(
+        firestore: FirebaseFirestore.instance,
+        auth: FirebaseAuth.instance,
+      ),
+      const ProfilePage(),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -34,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _logout() async {
     await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
     Navigator.pushReplacement(
-      // ignore: use_build_context_synchronously
       context,
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => Start(

@@ -11,6 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  mockito: ^5.4.0 
+  fake_cloud_firestore: ^3.1.0  # за Firestore
+  firebase_auth_mocks: ^0.14.1 # актуален, Dart 3 compatible
+
   # ML Kit
   google_mlkit_text_recognition: ^0.15.0
 
